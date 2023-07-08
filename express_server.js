@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 const PORT = 8081; // default port 8080
+const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 
 app.set("view engine", "ejs");
 
@@ -8,7 +10,12 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
-
+app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2'],
+  signed: false
+}));
 app.use(express.urlencoded({ extended: true }));
 
 // Our database of users
@@ -47,6 +54,14 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
+  res.render("urls_index", templateVars);
+});
+
+app.get("/urls", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"],
+    // ... any other vars
+  };
   res.render("urls_index", templateVars);
 });
 
